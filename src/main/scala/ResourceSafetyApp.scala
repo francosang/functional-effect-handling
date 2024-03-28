@@ -15,16 +15,18 @@ object ResourceSafetyApp extends IOApp {
   def writeAll[A](objects: List[A], file: File)(implicit
       encoder: RowEncoder[A]
   ): IO[Unit] = {
+    // UNSAFE implementation
     /*
-    UNSAFE
     for {
       fw <- IO.blocking(new FileWriter(file))
       contents = objects.map(encoder.encode).mkString("\n")
       _ <- IO.blocking(fw.write(contents))
+      // If error above, the following lines will not be executed
       _ <- IO.blocking(fw.flush())
       _ <- IO.blocking(fw.close())
     } yield ()
      */
+
     // SAFE implementation
     def use(fw: FileWriter): IO[Unit] = {
       val contents = objects.map(encoder.encode).mkString("\n")
@@ -32,7 +34,7 @@ object ResourceSafetyApp extends IOApp {
     }
 
     def release(fw: FileWriter): IO[Unit] =
-      IO.blocking(fw.close())
+      IO.blocking(fw.close()) *> IO.println("File closed")
 
     IO.blocking(new FileWriter(file)).bracket(use)(release)
   }
