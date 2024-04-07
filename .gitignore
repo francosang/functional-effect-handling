@@ -1,7 +1,12 @@
 .bsp
 .idea
-target
+/target
+/project/**/target
 test
 dest
 source
 .DS_Store
+.bloop
+.metals
+.vscode
+metals.sbt
