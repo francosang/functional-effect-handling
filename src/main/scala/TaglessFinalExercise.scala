@@ -18,6 +18,9 @@ object TaglessFinalExercise extends IOApp {
     def impl[F[_]: Temporal: Sync]: ImagesService[F] =
       new ImagesService[F] {
         override def fetchHttp(n: Int): F[List[Image]] = {
+
+          List(1, 2, 3).parTraverse(i => IO(i+1))
+
           Sync[F].flatMap(Temporal[F].sleep(1.second)) { _ =>
             List.range(0, n).parTraverse { i =>
               Sync[F].blocking(Image(List(i.toByte)))
